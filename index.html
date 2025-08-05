@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inscrição Temporada de Férias 2025</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #00A8E1, #6a4fbc);
+      color: white;
+    }
+    header {
+      background-color: transparent;
+      color: white;
+      padding: 32px 16px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+      text-transform: uppercase;
+      background-color: rgba(0,0,0,0.5);
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 12px;
+    }
+    section {
+  padding: 40px 20px;
+  background-color: rgba(255 255 255 / 0.15);
+  border-top: 1px solid rgba(255 255 255 / 0.3);
+  color: white;
+  max-width: 700px;
+  margin: 0 auto 40px;
+  border-radius: 8px;
+}
+    h3 {
+      margin-top: 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1em;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+    input[type="submit"], .inscrever {
+      background-color: #00A8E1;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1.1em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    input[type="submit"]:hover, .inscrever:hover {
+      background-color: #007dab;
+    }
+    .message {
+      margin-top: 20px;
+      font-weight: 700;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>TEMPORADA DE FÉRIAS 2025</h1>
+    <p>Transformando vidas em comunhão com Deus</p>
+  </header>
+
+  <section>
+    <h3>📝 Inscrição</h3>
+    <form id="inscricao-form">
+      <label for="nome">Nome Completo:</label>
+      <input type="text" id="nome" name="nome" required placeholder="Seu nome completo" />
+
+      <label for="idade">Idade:</label>
+      <input type="number" id="idade" name="idade" min="10" max="100" required placeholder="Sua idade" />
+
+      <label for="telefone">Telefone:</label>
+      <input type="tel" id="telefone" name="telefone" required placeholder="(92) 9 9999-9999" />
+
+      <label for="email">E-mail:</label>
+      <input type="email" id="email" name="email" required placeholder="email@exemplo.com" />
+
+      <label for="local">Local de Origem:</label>
+      <input type="text" id="local" name="local" required placeholder="Cidade/Bairro" />
+
+      <label for="alergias">Você tem alergias ou restrições?</label>
+      <textarea id="alergias" name="alergias" rows="3" placeholder="Escreva aqui se tiver"></textarea>
+
+      <input type="submit" value="Enviar Inscrição" />
+    </form>
+    <div class="message" id="message"></div>
+  </section>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Importa as funções do Firebase via CDN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGC0VltsvXlq5V_5jKoaX5X-NLE7mXNuQ",
+      authDomain: "temporada-de-ferias.firebaseapp.com",
+      projectId: "temporada-de-ferias",
+      storageBucket: "temporada-de-ferias.firebasestorage.app",
+      messagingSenderId: "73454276212",
+      appId: "1:73454276212:web:5c765bafb0926b8f564b21",
+      measurementId: "G-CE7S976N2J"
+    };
+
+    // Inicializa o Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById('inscricao-form');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // coleta dados do formulário
+      const dados = {
+        nome: form.nome.value.trim(),
+        idade: parseInt(form.idade.value),
+        telefone: form.telefone.value.trim(),
+        email: form.email.value.trim(),
+        local: form.local.value.trim(),
+        alergias: form.alergias.value.trim(),
+        timestamp: serverTimestamp()
+      };
+
+      try {
+        await addDoc(collection(db, "inscricoes"), dados);
+        messageDiv.textContent = "Inscrição enviada com sucesso! 🙌";
+        messageDiv.style.color = "#a0ffa0";
+        form.reset();
+      } catch (error) {
+        messageDiv.textContent = "Erro ao enviar inscrição: " + error.message;
+        messageDiv.style.color = "#ff9999";
+      }
+    });
+  </script>
+</body>
+</html>
+
 
