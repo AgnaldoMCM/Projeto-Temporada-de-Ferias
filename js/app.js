@@ -1,59 +1,52 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+// js/app.js
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDGC0VltsvXlq5V_5jKoaX5X-NLE7mXNuQ",
-  authDomain: "temporada-de-ferias.firebaseapp.com",
-  projectId: "temporada-de-ferias",
-  storageBucket: "temporada-de-ferias.appspot.com",
-  messagingSenderId: "73454276212",
-  appId: "1:73454276212:web:5c765bafb0926b8f564b21",
-  measurementId: "G-CE7S976N2J"
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_AUTH_DOMAIN",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_BUCKET",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const form = document.getElementById('inscricao-form');
-const messageDiv = document.getElementById('message');
+const form = document.getElementById("inscricao-form");
+const messageDiv = document.getElementById("message");
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const dados = {
-    nome: form.nome.value.trim(),
-    idade: parseInt(form.idade.value),
-    telefone: form.telefone.value.trim(),
-    email: form.email.value.trim(),
-    local: form.local.value.trim(),
-    alergias: form.alergias.value.trim(),
+  const data = {
+    nome: form.nome.value,
+    idade: form.idade.value,
+    telefone: form.telefone.value,
+    email: form.email.value,
+    local: form.local.value,
+    alergia: form.Alergia.value,
+    timestamp: new Date().toISOString()
   };
 
   try {
-    // Envia para Firebase Firestore
-    await addDoc(collection(db, "inscricoes"), {
-      ...dados,
-      timestamp: serverTimestamp(),
-    });
+    // Firebase Firestore
+    await addDoc(collection(db, "inscricoes"), data);
 
-    // Envia para Google Sheets via webhook
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzVQK9392xdvNyFR1SHv-alv7x220cDzP3C1FWAr576IUKgURC_23UsT7CXgfWiqwx1/exec", {
+    // Google Sheets (via Web App)
+    await fetch("https://script.google.com/macros/s/AKfycbzVQK9392xdvNyFR1SHv-alv7x220cDzP3C1FWAr576IUKgURC_23UsT7CXgfWiqwx1/exec", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(dados)
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
     });
 
-    if (!response.ok) throw new Error("Erro ao enviar para o Google Sheets");
-
-    messageDiv.textContent = "Inscrição enviada com sucesso! 🙌";
-    messageDiv.style.color = "#a0ffa0";
+    messageDiv.textContent = "Inscrição enviada com sucesso!";
     form.reset();
-
-  } catch (error) {
-    messageDiv.textContent = "Erro ao enviar inscrição: " + error.message;
-    messageDiv.style.color = "#ff9999";
+  } catch (err) {
+    console.error("Erro ao enviar:", err);
+    messageDiv.textContent = "Ocorreu um erro. Tente novamente.";
   }
 });
 
